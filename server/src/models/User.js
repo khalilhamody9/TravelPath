@@ -1,14 +1,21 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    passwordHash: { type: String, required: true }
-  },
-  { timestamps: true }
-);
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  passwordHash: { type: String, required: true }
+}, { timestamps: true });
 
-userSchema.index({ email: 1 }, { unique: true });
+// אל תוסיף כאן schema.index כדי להימנע מאזהרת אינדקס כפול
+
+userSchema.method("toClient", function () {
+  return {
+    id: this._id.toString(),
+    name: this.name,
+    email: this.email,
+    createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
+  };
+});
 
 export const User = mongoose.model("User", userSchema);
